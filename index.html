@@ -314,7 +314,39 @@
       : '<li class="empty">Tidak ada petugas</li>';
   }
 
+  // Menjaga agar tampilan tidak error walau ada bagian data yang kosong / format lama dari API
+  function normalisasi(res) {
+    res = res || {};
+    const arr = v => Array.isArray(v) ? v : [];
+    res.belum = res.belum || {};
+    res.stafKpr = arr(res.stafKpr);
+    res.blokWanita = arr(res.blokWanita);
+    res.kontrolStaf = arr(res.kontrolStaf);
+    res.kontrolPerwira = arr(res.kontrolPerwira);
+    let ap = res.apelPagi;
+    if (Array.isArray(ap)) ap = { pemimpin: ap, cadangan: [] };
+    ap = ap || {};
+    ap.pemimpin = arr(ap.pemimpin || ap.utama);
+    ap.cadangan = arr(ap.cadangan);
+    res.apelPagi = ap;
+    if (res.rupam) {
+      res.rupam.libur = arr(res.rupam.libur);
+      res.rupam.pagiMalam = res.rupam.pagiMalam || { regu: '-', petugas: [] };
+      res.rupam.siang = res.rupam.siang || { regu: '-', petugas: [] };
+      res.rupam.pagiMalam.petugas = arr(res.rupam.pagiMalam.petugas);
+      res.rupam.siang.petugas = arr(res.rupam.siang.petugas);
+    }
+    if (res.layananKunjungan) res.layananKunjungan.petugas = arr(res.layananKunjungan.petugas);
+    res.agendaInfo = res.agendaInfo || { status: 'KOSONG', pesan: '', daftar: [] };
+    res.agendaInfo.daftar = arr(res.agendaInfo.daftar);
+    res.media = res.media || {};
+    res.media.videos = arr(res.media.videos);
+    res.media.runningText = res.media.runningText || '';
+    return res;
+  }
+
   function renderDashboard(res) {
+    res = normalisasi(res);
     document.getElementById('displayTanggal').innerText = res.hariTanggalTeks;
 
     // Logo
