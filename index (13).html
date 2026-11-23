@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Operasional Rutan Kelas IIB Pacitan</title>
+  <style>
+    :root {
+      --bg: #0a1128; --panel: #131c3a; --panel-2: #0d1530; --line: #263256;
+      --blue: #38bdf8; --gold: #fbbf24; --green: #34d399; --red: #fb7185;
+      --text: #f8fafc; --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+    /* Ukuran dasar menyesuaikan lebar & tinggi layar: semua ukuran memakai rem */
+    html { font-size: 20px; } /* diatur otomatis oleh script sesuai ukuran layar */
+
+    body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+    /* ===== HEADER ===== */
+    header {
+      flex-shrink: 0; display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center;
+      gap: 1rem; padding: .6rem 1.4rem;
+      background: linear-gradient(90deg, #0f172a, #1e3a8a 50%, #0f172a);
+      border-bottom: 3px solid var(--gold);
+    }
+    .brand { display: flex; align-items: center; gap: .9rem; min-width: 0; }
+    .logos { display: flex; align-items: center; gap: .6rem; flex-shrink: 0; }
+    .logos img { height: 3.8rem; width: auto; max-width: 5.2rem; object-fit: contain; display: none; }
+    .brand-text { min-width: 0; }
+    .brand-text h1 { font-size: 1.15rem; color: var(--gold); text-transform: uppercase; letter-spacing: .02em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .brand-text p { font-size: .75rem; color: var(--muted); margin-top: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .nav { display: flex; align-items: center; justify-content: center; gap: .5rem; }
+    .btn { background: rgba(255,255,255,.08); color: #fff; border: 1px solid var(--line); width: 2.4rem; height: 2.4rem; border-radius: .5rem; font-size: 1rem; cursor: pointer; }
+    .btn:hover { background: rgba(255,255,255,.18); }
+    .btn-today { width: auto; padding: 0 .9rem; background: var(--gold); color: #0a1128; font-weight: 700; border: none; font-size: .85rem; }
+    .btn-today:hover { background: #f59e0b; }
+    .date { width: 13rem; text-align: center; font-size: 1.05rem; font-weight: 700; }
+
+    .clock { text-align: right; justify-self: end; }
+    .clock-time { font-size: 1.9rem; font-weight: 800; color: var(--green); font-variant-numeric: tabular-nums; line-height: 1; }
+    .clock-label { font-size: .72rem; color: var(--muted); margin-top: .2rem; }
+
+    /* ===== LAYOUT (default: halaman bisa di-scroll, tidak ada yang terpotong) ===== */
+    main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.25fr 1fr; gap: .9rem; padding: .9rem 1.2rem; }
+    .col { display: flex; flex-direction: column; gap: .8rem; min-height: 0; }
+
+    .card { flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: .8rem 1rem; }
+    .card-title { display: flex; justify-content: space-between; align-items: center; gap: .5rem; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); margin-bottom: .6rem; }
+    .badge { font-size: .74rem; font-weight: 700; padding: .15rem .65rem; border-radius: 99px; letter-spacing: 0; text-transform: none; }
+    .b-gold { background: var(--gold); color: #000; }
+    .b-green { background: var(--green); color: #000; }
+    .b-red { background: var(--red); color: #fff; }
+    .b-ghost { background: rgba(255,255,255,.1); color: var(--muted); }
+
+    /* ===== RUPAM ===== */
+    .card.rupam { flex: 1 1 auto; flex-shrink: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+    .rupam-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .shift { display: flex; flex-direction: column; min-height: 0; background: var(--panel-2); border-radius: .6rem; padding: .7rem .9rem; border-top: 3px solid var(--blue); }
+    .shift.siang { border-top-color: var(--gold); }
+    .shift-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .2rem .6rem; margin-bottom: .5rem; }
+    .shift-name { font-size: 1.05rem; font-weight: 800; }
+    .shift-time { font-size: .74rem; color: var(--muted); }
+    .regu { font-size: .8rem; color: var(--gold); font-weight: 700; margin-bottom: .4rem; }
+    .people { list-style: none; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .people li { flex: 1 1 0; min-height: 0; display: flex; justify-content: space-between; align-items: center; gap: .6rem; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .95rem; font-weight: 600; }
+    .people li:last-child { border-bottom: none; }
+    .people .jab { color: var(--muted); font-size: .75rem; font-weight: 400; align-self: center; text-align: right; }
+    .empty { color: var(--muted); font-size: .85rem; }
+
+    /* ===== PIKET LAIN ===== */
+    .duty { flex-shrink: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .row { padding: .45rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .row:last-child { border-bottom: none; padding-bottom: 0; }
+    .row:first-of-type { padding-top: 0; }
+    .lbl { display: block; font-size: .72rem; color: var(--muted); margin-bottom: .1rem; }
+    .val { font-size: .95rem; font-weight: 700; line-height: 1.35; }
+    .val.green { color: var(--green); }
+    .val.gold { color: var(--gold); }
+    .val small { color: var(--muted); font-weight: 400; font-size: .75rem; }
+
+    /* ===== VIDEO ===== */
+    .card.video-card { flex: 3 1 0; flex-shrink: 1; min-height: 12rem; padding: .6rem; display: flex; flex-direction: column; }
+    .video-card .card-title { margin: 0 .3rem .5rem; }
+    .video-box { flex: 1; min-height: 0; background: #000; border-radius: .5rem; overflow: hidden; }
+    .video-box iframe, .video-box video { width: 100%; height: 100%; border: none; }
+
+    /* ===== KUNJUNGAN ===== */
+    .kunj { display: grid; grid-template-columns: 1fr 1fr; gap: .2rem 1rem; }
+    .kunj-item { display: flex; justify-content: space-between; gap: .5rem; font-size: .82rem; padding: .2rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .kunj-item span { color: var(--muted); }
+    .kunj-item b { text-align: right; font-weight: 600; }
+    .kunj-empty { grid-column: 1/-1; text-align: center; color: var(--muted); padding: .6rem 0; font-size: .9rem; }
+
+    /* ===== AGENDA ===== */
+    .card.agenda { flex: 0 1 auto; flex-shrink: 1; min-height: 0; overflow: hidden; border: 1px solid rgba(251,191,36,.5); }
+    .agenda.today { border-color: var(--red); animation: pulse 2.5s infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 6px rgba(251,113,133,.35); } 50% { box-shadow: 0 0 16px rgba(251,113,133,.9); } }
+    .ag-note { color: var(--muted); font-size: .82rem; }
+    .ag-item { display: flex; gap: .6rem; padding: .4rem 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .88rem; }
+    .ag-item:last-child { border-bottom: none; }
+    .ag-when { color: var(--gold); font-weight: 700; white-space: nowrap; min-width: 3.8rem; }
+    .ag-what b { font-weight: 600; }
+    .ag-what small { display: block; color: var(--muted); font-size: .75rem; }
+    .ag-more { color: var(--muted); font-size: .78rem; margin-top: .25rem; }
+
+    /* ===== FOOTER ===== */
+    footer { height: 2.2rem; flex-shrink: 0; background: #060a18; border-top: 2px solid var(--blue); display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
+    .tick-label { background: var(--red); font-weight: 800; font-size: .78rem; padding: 0 .9rem; height: 100%; display: flex; align-items: center; z-index: 2; }
+    .marquee { display: inline-block; padding-left: 100%; animation: marq 40s linear infinite; font-size: .9rem; font-weight: 600; color: var(--gold); }
+    @keyframes marq { to { transform: translateX(-100%); } }
+
+    #loader { position: fixed; right: 1rem; bottom: 2.9rem; background: rgba(19,28,58,.92); border: 1px solid var(--line); border-radius: 99px; padding: .3rem .9rem; display: none; z-index: 99; font-size: .75rem; font-weight: 600; color: var(--gold); }
+    .cad { font-size: .8rem; font-weight: 500; color: var(--muted); margin-top: .1rem; }
+    .cad b { color: var(--text); font-weight: 600; }
+    .grp { margin-bottom: .3rem; font-size: .9rem; line-height: 1.3; }
+    .grp:last-child { margin-bottom: 0; }
+    .grp-lbl { display: inline-block; font-size: .68rem; font-weight: 700; padding: .02rem .5rem; border-radius: 99px; margin-bottom: .1rem; background: rgba(255,255,255,.1); color: var(--muted); }
+    .grp-lbl { display: block; width: fit-content; }
+    .grp-P { background: rgba(52,211,153,.2); color: var(--green); }
+    .grp-S { background: rgba(251,191,36,.2); color: var(--gold); }
+    .grp-X { background: rgba(251,113,133,.2); color: var(--red); }
+    .belum { color: var(--red); font-weight: 600; font-size: .85rem; }
+  </style>
+</head>
+<body>
+
+<div id="loader">&#8635; Memperbarui data…</div>
+
+<header>
+  <div class="brand">
+    <div class="logos">
+      <img id="logo1" alt="Logo 1">
+      <img id="logo2" alt="Logo 2">
+    </div>
+    <div class="brand-text">
+      <h1>Rumah Tahanan Negara Kelas IIB Pacitan</h1>
+      <p>Kementerian Imigrasi dan Pemasyarakatan RI &middot; Kanwil Jawa Timur</p>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn" onclick="geserTanggal(-1)" title="Kemarin">&#9664;</button>
+    <div class="date" id="displayTanggal">-</div>
+    <button class="btn" onclick="geserTanggal(1)" title="Besok">&#9654;</button>
+    <button class="btn btn-today" onclick="keHariIni()">Hari Ini</button>
+  </div>
+
+  <div class="clock">
+    <div class="clock-time" id="jamRealtime">00:00:00</div>
+    <div class="clock-label">WIB</div>
+  </div>
+</header>
+
+<main>
+  <!-- KIRI -->
+  <div class="col col-left">
+    <div class="card rupam">
+      <div class="card-title">
+        <span>Regu Pengamanan</span>
+        <span class="badge b-ghost" id="reguLiburBadge">Libur: -</span>
+      </div>
+      <div class="rupam-grid" id="rupamGrid"></div>
+    </div>
+
+    <div class="duty">
+      <div class="card">
+        <div class="card-title"><span>Kontrol &amp; Apel</span></div>
+        <div class="row">
+          <span class="lbl">Perwira Kontrol · 20.00–24.00</span>
+          <div class="val" id="valPerwira">-</div>
+        </div>
+        <div class="row">
+          <span class="lbl">Staf Kontrol · 20.00–00.00</span>
+          <div class="val" id="valKontrolStaf">-</div>
+        </div>
+        <div class="row">
+          <span class="lbl">Pemimpin Apel Pagi</span>
+          <div class="val green" id="valApelPagi">-</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span>Piket Staf</span></div>
+        <div class="row">
+          <span class="lbl">Staf KPR</span>
+          <div class="val" id="valStafKpr">-</div>
+        </div>
+        <div class="row">
+          <span class="lbl">Blok Wanita</span>
+          <div class="val gold" id="valBlokWanita">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KANAN -->
+  <div class="col">
+    <div class="card video-card">
+      <div class="card-title">
+        <span id="judulVideoAktif">Informasi Rutan</span>
+        <span class="badge b-green">VIDEO</span>
+      </div>
+      <div class="video-box" id="videoContainer"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Layanan Kunjungan · 08.00–14.00</span>
+        <span class="badge b-gold" id="badgeTimKunjungan">-</span>
+      </div>
+      <div class="kunj" id="gridKunjungan"></div>
+    </div>
+
+    <div class="card agenda" id="boxAgenda">
+      <div class="card-title">
+        <span>&#128276; Agenda</span>
+        <span class="badge b-gold" id="badgeStatusAgenda">INFO</span>
+      </div>
+      <div id="isiAgenda"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="tick-label">INFO</div>
+  <div class="marquee" id="teksBerjalan">Memuat informasi…</div>
+</footer>
+
+<script>
+  // Skala otomatis: semua ukuran (rem) mengikuti ukuran layar, tanpa scroll
+  function sesuaikanUkuran() {
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    document.documentElement.style.fontSize = Math.max(7, 20 * s) + 'px';
+  }
+  sesuaikanUkuran();
+  window.addEventListener('resize', sesuaikanUkuran);
+
+  // ===== PENGATURAN: tempel URL Web App Apps Script (yang berakhiran /exec) =====
+  const API_URL = "https://script.google.com/macros/s/AKfycby97ETxEC1ugVd-1XAfjYP9o_G1NHAgQN6LHS7eNMX5NDdoCPVnAdivRfuI2z1hhqCP/exec";
+
+  let currentTargetDate = new Date();
+  let videoPlaylist = [];
+  let currentVideoIdx = 0;
+  let videoTimer = null;
+  const MAX_AGENDA = 4;
+
+  function tampilJam() {
+    try {
+      document.getElementById('jamRealtime').innerText =
+        new Date().toLocaleTimeString('id-ID', { hour12: false, timeZone: 'Asia/Jakarta' }).replace(/\./g, ':');
+    } catch (e) {}
+  }
+  tampilJam();
+  setInterval(tampilJam, 1000);
+
+  // Pesan status kecil di pojok kanan bawah (menggantikan alert yang membekukan layar)
+  function statusPojok(teks, error) {
+    const el = document.getElementById('loader');
+    el.innerText = teks;
+    el.style.color = error ? 'var(--red)' : 'var(--gold)';
+    el.style.display = teks ? 'block' : 'none';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+  function formatIso(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function geserTanggal(n) { currentTargetDate.setDate(currentTargetDate.getDate() + n); muatData(); }
+  function keHariIni() { currentTargetDate = new Date(); muatData(); }
+
+  let timerUlang = null;
+  let sedangMuat = false;
+
+  function muatData() {
+    if (API_URL.indexOf('PASTE_') === 0) {
+      statusPojok('API_URL belum diisi di index.html', true);
+      return;
+    }
+    if (sedangMuat) return;
+    sedangMuat = true;
+    clearTimeout(timerUlang);
+    statusPojok('\u21BB Memperbarui data…', false);
+
+    fetch(API_URL + '?tanggal=' + formatIso(currentTargetDate), { cache: 'no-store' })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(res => {
+        if (res.error) throw new Error(res.error);
+        renderDashboard(res);
+        statusPojok('', false);
+      })
+      .catch(err => {
+        statusPojok('Gagal memuat data, mencoba lagi… (' + (err && err.message ? err.message : err) + ')', true);
+        timerUlang = setTimeout(muatData, 30000);
+      })
+      .finally(() => { sedangMuat = false; });
+  }
+
+  function setLogo(id, url) {
+    const img = document.getElementById(id);
+    if (!url) { img.style.display = 'none'; img.removeAttribute('src'); return; }
+    if (img.getAttribute('src') !== url) {
+      img.onload = () => { img.style.display = 'block'; };
+      img.onerror = () => { img.style.display = 'none'; };
+      img.src = url;
+    }
+  }
+
+  function listPetugas(arr) {
+    return arr.length
+      ? arr.map(p => `<li><span>${esc(p.nama)}</span><span class="jab">${esc(p.jabatan)}</span></li>`).join('')
+      : '<li class="empty">Tidak ada petugas</li>';
+  }
+
+  function renderDashboard(res) {
+    document.getElementById('displayTanggal').innerText = res.hariTanggalTeks;
+
+    // Logo
+    setLogo('logo1', res.media.logo1);
+    setLogo('logo2', res.media.logo2);
+
+    // Rupam
+    const BELUM = '<span class="belum">Jadwal belum diperbarui</span>';
+    const gridR = document.getElementById('rupamGrid');
+    const WARNA = { "P/M": "var(--blue)", "P": "var(--green)", "S": "var(--gold)", "M": "#a78bfa" };
+    if (res.belum && res.belum.rupam) {
+      document.getElementById('reguLiburBadge').innerText = "Libur: -";
+      gridR.style.gridTemplateColumns = '1fr';
+      gridR.innerHTML = `<div class="shift"><ul class="people"><li>${BELUM}</li></ul></div>`;
+    } else if (res.rupam) {
+      document.getElementById('reguLiburBadge').innerText = "Libur: " + (res.rupam.libur.join(", ") || "-");
+      const kel = res.rupam.kelompok;
+      gridR.style.gridTemplateColumns = `repeat(${Math.max(1, Math.min(4, kel.length))}, 1fr)`;
+      gridR.innerHTML = kel.length ? kel.map(x => `
+        <div class="shift" style="border-top-color:${WARNA[x.kode] || 'var(--blue)'}">
+          <div class="shift-head"><span class="shift-name">${esc(x.nama)}</span><span class="shift-time">${esc(x.jam)}</span></div>
+          <div class="regu">${esc(x.regu)}</div>
+          <ul class="people">${listPetugas(x.petugas)}</ul>
+        </div>`).join('')
+        : `<div class="shift"><ul class="people"><li class="empty">Tidak ada data dinas</li></ul></div>`;
+    }
+
+    // Kontrol & Apel
+    document.getElementById('valPerwira').innerHTML = res.belum.kontrolPerwira ? BELUM : res.kontrolPerwira.length
+      ? res.kontrolPerwira.map(p => `${esc(p.nama)}${p.jabatan ? ` <small>${esc(p.jabatan)}</small>` : ''}`).join("<br>") : "-";
+    document.getElementById('valKontrolStaf').innerHTML = res.belum.kontrolStaf ? BELUM
+      : (res.kontrolStaf.length ? esc(res.kontrolStaf.map(p => p.nama).join(", ")) : "-");
+    const ap = res.apelPagi;
+    document.getElementById('valApelPagi').innerHTML = res.belum.apelPagi ? BELUM
+      : (ap.pemimpin.length
+          ? esc(ap.pemimpin.join(", ")) + ap.cadangan.map((c, i) =>
+              `<div class="cad">Cadangan ${i + 1}: <b>${esc(c.nama)}</b> <small>tgl ${c.tanggal}</small></div>`).join('')
+          : "Libur");
+
+    // Piket Staf
+    const grpKpr = {};
+    res.stafKpr.forEach(s => { (grpKpr[s.kode] = grpKpr[s.kode] || []).push(s.nama); });
+    const blokKpr = [["P", "Pagi"], ["S", "Siang"], ["X", "Piket Libur"]]
+      .filter(([k]) => grpKpr[k] && grpKpr[k].length)
+      .map(([k, lbl]) => `<div class="grp"><span class="grp-lbl grp-${k}">${lbl}</span>${grpKpr[k].map(esc).join('<br>')}</div>`).join('');
+    document.getElementById('valStafKpr').innerHTML = res.belum.stafKpr ? BELUM : (blokKpr || "-");
+    document.getElementById('valBlokWanita').innerHTML = res.belum.blokWanita ? BELUM
+      : (res.blokWanita.length ? esc(res.blokWanita.join(", ")) : "Libur");
+
+    // Kunjungan
+    const badgeK = document.getElementById('badgeTimKunjungan');
+    const gridK = document.getElementById('gridKunjungan');
+    if (res.belum.kunjungan) {
+      badgeK.innerText = "-";
+      badgeK.className = "badge b-ghost";
+      gridK.innerHTML = `<div class="kunj-empty">${BELUM}</div>`;
+    } else if (res.layananKunjungan && res.layananKunjungan.aktif) {
+      badgeK.innerText = res.layananKunjungan.tim;
+      badgeK.className = "badge b-green";
+      gridK.innerHTML = res.layananKunjungan.petugas.length
+        ? res.layananKunjungan.petugas.map(k => `<div class="kunj-item"><span>${esc(k.tugas)}</span><b>${esc(k.nama)}</b></div>`).join('')
+        : `<div class="kunj-empty">Susunan ${esc(res.layananKunjungan.tim)} belum diisi</div>`;
+    } else {
+      badgeK.innerText = "TUTUP";
+      badgeK.className = "badge b-red";
+      gridK.innerHTML = `<div class="kunj-empty">Tidak ada layanan kunjungan hari ini</div>`;
+    }
+
+    // Agenda
+    const box = document.getElementById('boxAgenda');
+    const badge = document.getElementById('badgeStatusAgenda');
+    const isi = document.getElementById('isiAgenda');
+    const ag = res.agendaInfo;
+    box.classList.remove('today');
+
+    if (ag.status === "ADA_HARI_INI") {
+      box.classList.add('today');
+      badge.innerText = "HARI INI";
+      badge.className = "badge b-red";
+      isi.innerHTML = ag.daftar.slice(0, MAX_AGENDA).map(a =>
+        `<div class="ag-item"><div class="ag-when">${esc(a.waktu)}</div><div class="ag-what"><b>${esc(a.kegiatan)}</b><small>${esc(a.tempat)}</small></div></div>`
+      ).join('') + (ag.daftar.length > MAX_AGENDA ? `<div class="ag-more">+${ag.daftar.length - MAX_AGENDA} agenda lainnya</div>` : '');
+    } else if (ag.status === "ADA_BULAN_INI") {
+      badge.innerText = "BULAN INI";
+      badge.className = "badge b-gold";
+      isi.innerHTML = `<div class="ag-note">${esc(ag.pesan)}</div>` +
+        ag.daftar.slice(0, MAX_AGENDA).map(a =>
+          `<div class="ag-item"><div class="ag-when">Tgl ${a.hariKe}</div><div class="ag-what"><b>${esc(a.kegiatan)}</b><small>${esc(a.waktu)}${a.tempat ? ' · ' + esc(a.tempat) : ''}</small></div></div>`
+        ).join('') + (ag.daftar.length > MAX_AGENDA ? `<div class="ag-more">+${ag.daftar.length - MAX_AGENDA} agenda lainnya</div>` : '');
+    } else {
+      badge.innerText = "KOSONG";
+      badge.className = "badge b-ghost";
+      isi.innerHTML = `<div class="ag-note">${esc(ag.pesan)}</div>`;
+    }
+
+    // Running text & video
+    document.getElementById('teksBerjalan').innerText = res.media.runningText;
+    if (videoPlaylist.length === 0 && res.media.videos.length > 0) {
+      videoPlaylist = res.media.videos;
+      putarVideoBerikutnya();
+    }
+  }
+
+  function putarVideoBerikutnya() {
+    if (videoPlaylist.length === 0) return;
+    if (videoTimer) clearTimeout(videoTimer);
+
+    const vid = videoPlaylist[currentVideoIdx];
+    const c = document.getElementById('videoContainer');
+    document.getElementById('judulVideoAktif').innerText = vid.judul || "Informasi Rutan";
+
+    if (vid.tipe === "YOUTUBE") {
+      c.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid.id}?autoplay=1&mute=1&loop=1&playlist=${vid.id}&controls=0&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    } else if (vid.tipe === "DRIVE") {
+      c.innerHTML = `<iframe src="https://drive.google.com/file/d/${vid.id}/preview?autoplay=1" allow="autoplay"></iframe>`;
+    } else {
+      c.innerHTML = `<video src="${vid.url}" autoplay muted loop></video>`;
+    }
+
+    currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length;
+    if (videoPlaylist.length > 1) {
+      videoTimer = setTimeout(putarVideoBerikutnya, (vid.durasi || 60) * 1000);
+    }
+  }
+
+  muatData();
+  setInterval(muatData, 300000);
+</script>
+</body>
+</html>
